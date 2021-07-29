@@ -1,0 +1,160 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: splunk-otel-agent
+  labels:
+    app: splunk-otel-agent
+  namespace: openshift-operators
+rules:
+
+- apiGroups:
+  - quota.openshift.io
+  resources:
+  - clusterresourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/spec
+  - nodes/proxy
+  - pods
+  - pods/status
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - services
+  - resourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+  - list
+  # We need create because kubelet takes a POST for the stat query
+  - create
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+    - autoscaling
+  resources:
+    - horizontalpodautoscalers
+  verbs:
+    - get
+    - list
+    - watch
+- nonResourceURLs:
+  - '/metrics'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+  - create
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: splunk-otel-agent
+  name: splunk-otel-agent
+  namespace: openshift-operators
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: splunk-otel-agent
+  labels:
+    app: splunk-otel-agent
+  namespace: openshift-operators
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: splunk-otel-agent
+subjects:
+- kind: ServiceAccount
+  name: splunk-otel-agent
+  namespace: openshift-operators
+---
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: splunk-otel-agent
+users:
+- system:serviceaccount:openshift-operators:splunk-otel-agent
+priority: 10
+allowHostNetwork: false 
+allowHostPorts: true
+allowHostPID: true
+allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowPrivilegedContainer: false
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- hostPath
+- secret
+# Allow podman/crio socket and /proc access
+seLinuxContext:
+  type: MustRunAs
+  seLinuxOptions:
+    user: "system_u"
+    role: "system_r"
+    type: "spc_t"
+    level: "s0"
+allowedFlexVolumes: []
+defaultAddCapabilities: []
+fsGroup:
+  type: MustRunAs
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+requiredDropCapabilities: []
