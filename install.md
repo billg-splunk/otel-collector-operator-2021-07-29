@@ -24,6 +24,6 @@ oc apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/la
 oc apply -f operator.yaml
 ```
 
-6. Verify the installable
-    Verify that each node is succesfully running one copy of ```splunk-otel-agent-collector```.
-    Verify that metrics/traces are showing up in Splunk APM dashboard.
+6. Verify the installation
+* Verify that each node is succesfully running one copy of ```splunk-otel-agent-collector```
+* Verify that metrics/traces are showing up in Splunk APM dashboard.
