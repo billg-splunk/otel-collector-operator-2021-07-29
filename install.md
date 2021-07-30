@@ -1,3 +1,15 @@
+0. If you don't have Openshift deployed, you can follow the instructions here:
+* [CodeReady Containers](https://crc.dev/crc/#installation_gsg)
+* Login as an admin
+```
+oc login -u kubeadmin https://api.crc.testing:6443
+```
+* Install cert-manager
+```
+oc create namespace cert-manager
+oc apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
+```
+
 1. Switch to `openshift-operators` namespace/project.
 ```
 oc project openshift-operators
