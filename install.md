@@ -38,4 +38,14 @@ oc apply -f operator.yaml
 
 6. Verify the installation
 * Verify that each node is succesfully running one copy of ```splunk-otel-agent-collector```
+* For example:
+```
+➜ oc get po
+NAME                                READY   STATUS    RESTARTS   AGE
+splunk-otel-agent-collector-5t4f6   1/1     Running   0          3m39s
+```
 * Verify that metrics/traces are showing up in Splunk APM dashboard.
+  * Login to Splunk Observability Cloud
+  * Go to Infrastructure
+  * Click on Kubernetes
+  * You should see your cluster, named as you did in the previous step
